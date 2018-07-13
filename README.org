@@ -1,0 +1,537 @@
+* installing arch dot txt
+  this is an attempt at a comprehensive, front to back, install guide for
+  lenovo's 6th gen carbon x1. my model is the 20KG-0022US, which I bought from
+  Costco, and comes with an 8th gen intel i7, 16gb ram, and 512gb PCIe ssd. My
+  instructions will thus have mentions of specific components from this
+  laptops as they appear in the guide, but I will try to make it clear when
+  such a case may not hold for others with respect to 6th gen x1 versions.
+
+** live usb
+   1. download the img from https://www.archlinux.org/download/
+      - torrent is faster, also remember to seed
+      - alternatively just dl the iso directly, slightly slower
+   2. install
+      - find your usb
+        #+BEGIN_SRC sh
+          lsblk
+        #+END_SRC
+        - it will probably be named ~sda~ or ~sdb~, pay attention to the size
+          of the drives upon output to be sure.
+        - you are going to use the name of the drive itself, ~sdx~, so *do not* include
+          a number, such as ~sdx1~ in the drive name for the command below
+        - make sure it is unmounted with:
+          #+BEGIN_SRC 
+            umount /dev/sdx # x = letter of your actual drive
+          #+END_SRC
+      - in term:
+        #+BEGIN_SRC sh
+          dd bs=4M if=/path/to/iso of=/path/to/usb status=progress oflag=sync
+        #+END_SRC
+      - example in my case:
+        #+BEGIN_SRC sh
+          dd bs=4M if=~/Downloads/archlinux-2018.07.01-x86_64.iso of=/dev/sda status=progress oflag=sync
+        #+END_SRC
+        - *note*: I did this on Ubuntu with Gnome, and it proved not possible
+          to format it with the drive entirely unmounted because of how
+          Nautillus handles mounting jump drives. Therefore, I actually did
+          this with it mounted but had no problems so ¯\_(ツ)_/¯
+          linux ¯\_(ツ)_/¯ ymmv ¯\_(ツ)_/¯
+      - upon finishing, insert the usb into the x1
+   3. disable safe boot
+      - turn on laptop (or hard reset to ensure true "turn off"), press enter
+        at lenovo boot screen
+      - under Security, you will find the option. Disable it.
+   4. ensure your usb is first in boot order
+      - under Startup, go to boot
+      - using the - and + keys, make sure it is at the top of the list
+      - press F10 to save our configs and exit.
+         
+   If everything went well, we will now boot into the arch iso. 
+
+** setting up to install
+   You are going to need to be familiar with vim, nano, pico, emacs, idc,
+   something, this is on you, fam.
+
+   1. configure our mirrors to download software from
+      - this is the difference between a 20kb/s and ~10mb/s download speed, at
+        least in my case first time round
+      - the mirror list is found in ~/etc/pacman.d/mirrorlist~
+        - the logic is simple: the earlier a mirror item appears in the list,
+          the greater preference it is given for use as a source.
+      - copy and paste a server that is close to you geographically and insert
+        it at the top of the list.
+        - server i chose for those in USA who are lazy:
+          #+BEGIN_SRC sh
+            Server = http://mirrors.lug.mtu.edu/archlinux/$repo/os/$arch
+          #+END_SRC
+      - *important* refresh our mirrorlist
+        #+BEGIN_SRC sh
+          pacman -Sy
+        #+END_SRC
+        - we will now have (hopefully) fast downloads for our packages
+   2. configure wifi (skippable?)
+      - x1 does not have a ether port, but adaptors exist
+        - these adaptors supposedly work without issue but I don't have one,
+          so I'm assuming you don't either
+        - dilemma: we don't have fucking internet by default
+        - solution: ~netctl~
+      - find the name of your wifi card device
+        - I would assume x1's have the same name, but who knows:
+          #+BEGIN_SRC sh
+            ip link
+          #+END_SRC
+        - mine was ~wlp2s0~, arch wiki suggests that anything that starts with
+          a ~w~ is probably the wifi card
+      - figure out the wifi point you are going to use.
+        - I'm going to assume it is either of "simple" wpa or wpa-enterprise
+          - the latter is at corporate or university settings if that helps
+          - luckily ~netctl~ provides templates for both. copy the appropriate
+            one and place it in the root of ~netctl~ as so:
+            #+BEGIN_SRC sh
+              # simple wpa, such as home routers
+              cp /etc/netctl/examples/wireless-wpa /etc/netctl/<NAME-YOU-WANT-TO-GIVE-IT>
+
+              # enterprise wpa
+              cp /etc/netctl/examples/wireless-wpa-configsection /etc/netctl/<NAME-YOU-WANT-TO-GIVE-IT>
+            #+END_SRC
+          - ~wireless-wpa~ looks like this:
+            #+BEGIN_SRC conf
+              Description='A simple WPA encrypted wireless connection'
+              Interface=wlan0
+              Connection=wireless
+
+              Security=wpa
+              IP=dhcp
+
+              ESSID='MyNetwork'
+              # Prepend hexadecimal keys with \"
+              # If your key starts with ", write it as '""<key>"'
+              # See also: the section on special quoting rules in netctl.profile(5)
+              Key='WirelessKey'
+              # Uncomment this if your ssid is hidden
+              #Hidden=yes
+              # Set a priority for automatic profile selection
+              #Priority=10
+            #+END_SRC
+          - ~wireless-wpa-configsection~ looks like this:
+            #+BEGIN_SRC conf
+              Description='A wireless connection using a custom network block configuration'
+              Interface=wlan0
+              Connection=wireless
+              Security=wpa-configsection
+              IP=dhcp
+              WPAConfigSection=(
+                  'ssid="University"'
+                  'key_mgmt=WPA-EAP'
+                  'eap=TTLS'
+                  'group=TKIP'
+                  'pairwise=TKIP CCMP'
+                  'anonymous_identity="anonymous"'
+                  'identity="myusername"'
+                  'password="mypassword"'
+                  'priority=1'
+                  'phase2="auth=PAP"'
+              )
+            #+END_SRC
+          - *in both cases*:
+            - ~Interface~ takes the value of the wifi card device name we
+              found earlier
+            - ~Security~, ~Connection~, and ~IP~ remain untouched
+            - Do what you will with ~Description~
+          - For vanilla ~wireless-wpa~, the config explains itself:
+            - ~ESSID~ is the name of your wifi access point
+            - ~Key~ is the password
+          - For ~wireless-wpa-configsection~, things can be trickier:
+            - ~ssid~ is access point
+            - ~key_mgmt~ should remain untouched in most cases
+            - ~eap~ is entirely dependent on your case, for many (aka
+              including me), it is ~PEAP~
+            - ~pairwise~ is dependent on your situation (i did not need it)
+            - ~anonymous_identity~ is dependent on your situation (i did not need it)
+            - ~password~ is password
+            - ~priority~ is dependent on your situation (i did not need it)
+            - ~phase2~ is dependent on your situation (i did not need it)
+            - if my list appears not very useful in terms of help and
+              explanation, then you understand the very nature of who is
+              writing it and i'm so sorry i'm trying
+            - example ~wireless-wpa-configsection~ i actually used (with
+              values obviously substituted in):
+              #+BEGIN_SRC conf
+                Description='lol'
+                Interface=wlp2s0
+                Connection=wireless
+                Security=wpa-configsection
+                IP=dhcp
+                WPAConfigSection=(
+                    'ssid="wutang"'
+                    'key_mgmt=WPA-EAP'
+                    'eap=PEAP'
+                    'identity="ghostfacekillah"'
+                    'password="suuuuuuuuuuuuu69"'
+                )
+              #+END_SRC
+      - save your config file, time to connect:
+        #+BEGIN_SRC sh
+          netctl start <NAME-OF-YOUR-WIFI-PROFILE>
+        #+END_SRC
+        - it should take like 3 seconds to connect
+        - if nothing happens, it worked
+        - check with a quick ~ping 8.8.8.8~, if packets are shooting out, you
+          got internet.
+          - otherwise, diagnose with ~journalctl -xe~ and use those arch wikis
+            and forums! welcome to arch :)))))))))))))))))
+
+** freeze: partition time!
+   that was a bad joke jesus christ forgive me
+
+   1. make sure we have (U)EFI
+      - i am doing all of this on the *presumption we have EFI*, maybe
+        should have brought that up while we were in BIOS
+      - go back to BIOS and un-enable legacy mode, given that the x1 should
+        come with (U)EFI by default enabled.
+      - use the following command to ensure we are in EFI mode:
+        #+BEGIN_SRC sh
+          ls /sys/firmware/efi/
+        #+END_SRC
+        - *if the directory exists, we are good*
+   2. figure out where our main drive is
+      1. find our drives with ~lsblk~ yet again
+         - my x1 came with a PCIe ssd, yours may or may not and, more
+           importantly, this influences its name as seen with ~lsblk~
+           - for the PCIe ssd, it will be called something like ~nvme0n1~, with
+             each partition appending a ~p1~, ~p2~, and so forth
+           - for others, it may appear as the traditional ~sda~, with a number
+             appended for each partition as it did above for your usb stick.
+           - will assume we are using ~nvme0n1~ as our os drive hereon
+         - my x1 came with windows installed and i assumed yours did, too.
+           - i am going to kill windows with this install.
+             - cannot have an optimally secure setup otherwise (or rather, I'm
+               not going to put up with that much of a headache).
+           - if you want to keep a dual boot setup, this is not the guide for you.
+           - i am sorry to fail you like this. f.
+   3. partitioning and configuring
+      1. we will now format our main drive with arch
+         #+BEGIN_SRC 
+           gdisk /dev/nvme0n1
+         #+END_SRC
+         - you will enter a prompt of sorts for gdisk 
+         - you should get some output about a valid GPT partition found
+            alongside with a protected MBR partition. This is good.
+      2. we will now wipe the disk.
+         - *this is permanent. stop now or forever hold your peace*
+         - I will be listing the commands in order and describe what they do
+           as subpoints:
+           - ~o~
+             - we are wiping the disk. answer ~y~ to continue.
+           - ~n~
+             - command for making a new partition.
+           - ~Enter~
+             - we want the default number for the partition, and this
+               convention will hold throughout the rest of the guide.
+           - ~Enter~
+             - we don't want to specify the starting vector for the partition,
+               and this convention will hold throughout the rest of the
+               guide.
+           - ~+512MB~
+             - we want our first partition to be of size 512MB. This is to
+               meet the specification for a EFI boot partition.
+           - ~EF00~
+             - this is the hex code type to indicate we want the partition to
+               be of EFI
+             - *partition 1 done*
+           - ~n~
+             - making another partition
+           - ~Enter~
+           - ~Enter~
+           - ~Enter~
+             - the final partition is going to take the rest of our disk. If
+               you do not want this, assign it something else like we did
+               above.
+           - ~8E00~
+             - this is the linux LVM (logical volume manager) format, which we
+               are going to need for our encryption scheme.
+             - *second partition done*
+             - we are now done making /physical/ partitions
+           - ~w~
+             - *we are going to write to disk*
+           - ~y~
+             - *we just wrote to disk. goodbye everything else*
+      3. encryption with ~cryptsetup~
+         - make sure to use our *second partition*
+           - *not* our EFI partition
+             #+BEGIN_SRC sh
+               # in my case, this is...
+               cryptsetup luksFormat /dev/nvme0n1p2
+             #+END_SRC
+           - you will be prompted for a password, make it a good one
+           - we do not specify the luks type, such as ~luks2~, because it is
+             incompatible with GRUB. We will not be using GRUB, but I do not
+             want to screw myself (or you) out of that option.
+             - for the love of god, do not forget this password
+             - this process could take like 2 or 3 or 4 hours depending on
+               your experience and the last thing you need to do is forget the
+               fucking luks password.
+           - what we have now is a Luks container, which we will be using to
+             put our actual OS/data in, which makes handling encryption logic
+             easier in the long run.
+   4. generation of logical volumes within our LVM
+      1. open our encrypted container:
+         - we need to name the container, I am choosing ~main_part~ for main
+           partition, it really doesn't matter
+           #+BEGIN_SRC sh
+             cryptsetup open --type luks /dev/nmve0n1p2 main_part
+           #+END_SRC
+         - this should now be available at ~/dev/mapper/main_part~
+      2. create a physical volume within our LVM partition:
+         #+BEGIN_SRC sh
+           pvcreate /dev/mapper/main_part
+         #+END_SRC
+         - this creates a "physical" volume inside of our luks container
+      3. create a volume group
+         - we need to name this one, I'm choosing ~main_group~ to continue
+           the theme
+         - this will go on "top" of our physical container we just made, ergo
+           why we create our group from it.
+           #+BEGIN_SRC sh
+             vgcreate main_group /dev/mapper/main_part
+           #+END_SRC
+      4. generate our logical partitions within the luks container
+
+         I am following the wiki piece for piece here, and what you ultimately
+         make the size of your swap (if any), root, and home (if any) is
+         completely your call. The numbers I use are pulled from thin air and
+         because I have so much space to use with the ssd that came with my
+         x1.
+
+         Note that for each instance, we are taking our logical partition from
+         the volume group we just created. *Be conscious of this*.
+
+         1. create swap:
+            #+BEGIN_SRC sh
+              # 8 gb for swap
+              lvcreate -L8G main_group -n swap
+            #+END_SRC
+         2. create root
+            #+BEGIN_SRC sh
+              # 8 gb for swap
+              lvcreate -L64G main_group -n root
+            #+END_SRC
+         3. create home
+            #+BEGIN_SRC sh
+              lvcreate -l 100%FREE main_group -n home
+            #+END_SRC
+            - we use a special trick to allocate all remaining memory in our
+              ssd to home. it goes without saying that do not do this if you
+              do not want to allocate all of it to home, etc.
+
+   5. format and mount our logical partitions
+
+      Note that our resultant logical volumes are named
+      ~<VOLUME_GROUP_NAME>-<root|home|swap>~, so my home is
+      ~/dev/mapper/main_group-home~ for example.
+
+      1. root and home:
+         #+BEGIN_SRC sh
+           mkfs.ext4 /dev/mapper/main_group-root
+           mkfs.ext4 /dev/mapper/main_group-home
+         #+END_SRC
+
+      2. swap:
+         #+BEGIN_SRC 
+           mkswap /dev/mapper/main_group-swap
+         #+END_SRC
+
+      3. mount our new volumes
+
+         1. mount our new volumes
+             
+            The logic here is that ~/mnt/~ translates to ~/~ for our actual
+            arch system once we install arch, so keep this in
+            mind. ~/mnt/boot~ becomes ~/boot/~, ~/mnt/home/~ becomes home,
+            etcetera. 
+            #+BEGIN_SRC sh
+              mount /dev/mapper/main_group-root /mnt/
+              mkdir /mnt/home
+              mount /dev/mapper/main_group-home /mnt/home
+              swapon /dev/mapper/main_group-swap
+            #+END_SRC
+
+         2. mount our bootloader
+             
+            Remember the first partition we made (~nvme0n1p1~ in my case)? We
+            now need to mount it as the boot loader:
+            #+BEGIN_SRC sh
+              mkdir /mnt/boot/
+              mount /dev/nvme0n1p1 /mnt/boot
+            #+END_SRC
+
+** installing arch and setting it up to boot and run
+   1. install arch onto ~/mnt~
+      #+BEGIN_SRC sh
+        pacstrap /mnt/ base
+      #+END_SRC
+      - note, a popular additional option to include is ~base-devel~, so
+         install that as well if you see yourself needing to compile and link
+         a lot of things, such as through AUR. 
+      - *CONGRATS!*
+        - you have installed arch!
+      - *CONGRATS!*
+        - you are not even remotely close to done installing arch!
+        - it won't even boot correctly as of now!
+        - welcome to arch :~)
+      - generate our fstab file
+        - this is important for bootloading purposes, not the last time we will
+          deal with this. It holds information about partitions, can't say much
+          more about this.
+          #+BEGIN_SRC sh
+            genfstab -p /mnt >> /mnt/etc/fstab
+          #+END_SRC
+   2. log into arch and installing stuff!
+      #+BEGIN_SRC sh
+        archroot /mnt
+      #+END_SRC
+      - we are now in the arch install and no longer "in" the liveusb
+      - install important packages
+        - we have access to things, like wifi, that are not yet actually
+          configured yet on the operating system, thus we should take advantage
+          of this by installing some packages.
+        - some of these are subjective, others are ones I have taken from people
+          who know more about arch than I do
+        - for a fact will want to install all the packages in relation to wifi
+          if you do not have an adapter like me.
+          #+BEGIN_SRC 
+            pacman -S wpa_supplicant networkmanager network-manager-applet dialogue 
+          #+END_SRC
+        - other packages others recommend:
+          #+BEGIN_SRC sh
+            pacman -S linux-headers linux-lts linux-lts-headers
+          #+END_SRC
+          - we are essentially installing another copy of the linux kernal for
+            purposes of stability: if something goes wrong with an update of the
+            kernal, you will have a backup kernal to get into.
+          - additionally, we are installing the headers for both the current
+            kernal and the lts kernal: these are useful for other packages that
+            need to link/bind against them for development purposes, etc.
+        - finally, we install another useful operating system:
+          #+BEGIN_SRC sh
+            pacman -S emacs
+          #+END_SRC
+          - .... or vim if that's your choice.... definitely more efficient
+            memory wise
+          - c.f. i will /die/ before i give up my elisp
+   3. modify ~/etc/mkinitcpio.conf~ to enable encryption
+      - as with most things in this guide, taken directly from the wiki.
+      - there is a variable in here named ~HOOKS~, which the file makes clear
+        is important to the boot order of the operating system.
+      - make yours look like this:
+        #+BEGIN_SRC conf
+          HOOKS=(base udev autodetect keyboard keymap modconf block encrypt lvm2 filesystems fsck)
+        #+END_SRC
+        - you will notice that we *moved* ~keyboard~ to after ~autodetect~
+        - *added* ~keymap~ to after ~keyboard~
+        - *added* ~encrypt~ and ~lvm2~ after ~block~ and before ~filesystems~
+        - *do not fuck this up*
+      - regenerate our ~initramfs~:
+        #+BEGIN_SRC sh
+          mkinitcpio -p linux
+        #+END_SRC
+        - we regenerate the image of the operating system here
+        - it now takes into account the new boot items and order we have
+          specified in the ~HOOKS~ variable
+        - *if you installed* the ~linux-lts~ kernal, you have to *do it again* for that
+          as well
+          #+BEGIN_SRC sh
+            mkinitcpio -p linux-lts
+          #+END_SRC
+        - _we are getting there, lads, hold on. for the promise land is close._
+   4. setting up the bootloader itself
+
+      I am using bootctl, not grub. Your call to make ultimately.
+
+      1. create our loader with bootctl
+         #+BEGIN_SRC 
+           bootctl --path=/boot/ install
+         #+END_SRC
+
+      2. create arch loader
+         - modify the file ~/boot/loader.conf~ to reflect the following:
+           #+BEGIN_SRC conf
+             default arch
+             timeout 3
+             editor 0 
+           #+END_SRC
+           - ~default~ is the default entry to select when booting
+           - ~timeout~ is the time before the entry is loaded at the boot menu
+           - ~editor~ is whether to enable the the kernal parameters
+             editor. This is import to disable for security purpose and is
+             *enabled by default, so make sure to disable as above*
+
+      3. create arch.conf
+         1. you are going to need a variable value provided by the command
+            ~blkid~
+            - you will either need to write it down by hand to copy with nano
+              or use ~emacs~ or ~vim~ to evaluate it in buffer to copy
+              - emacs has ~eshell~, which you can use like the normal shell but
+                copy and paste with
+              - vim has the command ~:r !blkid~ which will read in the file
+                directly
+            - this variable is the ~UUID~ for ~/dev/nvme0n1p2~ as given from ~blkid~
+              - ~/dev/nvme0n1p2~ is the second physical partition we made at the
+                very beginning. If yours is ~/dev/sda2~ or similar, use that
+                instead.
+              - you will know it is the correct entry if the line also includes
+                ~TYPE="crypto_LUKS" PARTLABEL="Linux LVM"~
+            - example:
+              #+BEGIN_SRC conf
+                /dev/nvme0n1p2: UUID="really-long-string-of-alphanumericals" TYPE="crypto_LUKS" PARTLABEL="Linux LVM" PARTUUID="another-long-string-of-alphanumericals"
+              #+END_SRC
+              - note: we want the value of ~UUID~, *NOT* ~PARTUUID~ or
+                anything else.
+         2. with this value copied, create the file
+            ~/boot/loader/entries/arch.conf~:
+            #+BEGIN_SRC conf
+              title Arch Linux
+              linux /vmlinuz-linux # not a typo
+              initrd /initramfs-linux.img # what we made with mkinitcpio -p linux
+              options cryptdevice=UUID=long-alphanumerica-string-WITHOUT-QUOTES:cryptlvm root=/dev/mapper/main_group-root quiet rw
+            #+END_SRC
+            - as i try to hint, make sure to remove the quotes around the UUID
+              value as copied and pasted
+            - note that we add a ~:cryptlvm~ to the end of that value
+            - after a single space, we added the location of our root
+              partition within the luks container,
+              ~root=/dev/mapper/main_group-root/~ in my case
+            - finally, we add the options ~quiet rw~
+   5. From here, we can *officially reboot into our install and it should
+      work*
+      - 🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉
+      - 🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉
+      - execute ~shutdown now~
+      - remove the usb once the laptop turns off
+      - you should eventually see the boot screen which will automatically
+        boot into arch after 2 seconds or so
+      - enter your password for the encrypted partition when asked, then login
+        as ~root~ and press enter for the password, seeing as we have yet to
+        make one.
+
+** loose ends
+    
+   .... we aren't done yet :~) 🎉🎉🎉
+
+   1. reconfigure our wifi
+      - i hope you installed those wifi packages i told you to install and or
+        you have a lan connection
+      - refollow the steps we did above for wifi to regain our connection
+   2. reconfigure our mirror list
+      - again, do as we did before with ~/etc/pacman.d/mirrorlist~
+   3. configure locale.gen and time
+      1. enter ~/etc/locale.gen~
+         - we need to tell arch what our locale is by going to the line and
+           uncommenting our respective locale
+           - usa peeps will use the line ~en_US.UTF-8 UTF8~
+      2. run ~locale-gen~
+      3. sync our clock with ~hwclock --systohc --utc~
+   4. change password for root with ~passwd~
+      - self explanatory, but know this is the password exclusively for
+        ~root~, not for your own user you'll make later who will have sudo
+        user privileges.
