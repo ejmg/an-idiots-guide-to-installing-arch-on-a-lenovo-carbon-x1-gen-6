@@ -20,7 +20,9 @@
      the GNU GPLv3 license at its center, and playing some soft but slightly
      erotic ambient music so that we may pray to stallman that this goes
      smoothly
-     [[file:stallman-dot-png.jpg][st ignucius, may he guide us with his holy light]]
+
+     [[./stallman-dot-png.jpg][st. ignucius, may he guide us]]
+
    - put aside like 2-4 hours for this depending on how inexperienced you are
      - this took me a quick minute because i would double check input text
        before executing a command, cross referencing what wikis/videos said to
