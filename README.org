@@ -9,10 +9,16 @@
   laptops as they appear in the guide, but I will try to make it clear when
   such a case may not hold for others with respect to 6th gen x1 versions.
 
+  i want to make a shoutout to specific sources for informing this guide. it's
+  the result of mashing together and cross referencing the wiki with multiple
+  tutorials and guides where I would verify instructions and install
+  strategies. Included in this list is [[https://www.youtube.com/channel/UCxQKHvKbmSzGMvUrVtJYnUA][LearnLinux.tv]], [[https://www.youtube.com/channel/UCNgMPxqWds9IYR_QFNPButw][Kai Hendry]], [[https://www.youtube.com/channel/UCNgMPxqWds9IYR_QFNPButw][Lucas
+  Alvares Gomes]], [[https://ticki.github.io/blog/setting-up-archlinux-on-a-lenovo-yoga/][Ticki]], and [[https://kozikow.com/2016/06/03/installing-and-configuring-arch-linux-on-thinkpad-x1-carbon/#Disable-secure-boot][Robert Kozikowski]]. ya'll helped a homie.
+
 ** sacrifices, incantations
    since we are installing arch, there a a few precautions you'll want to
    take/keep in mind:
-   - if you shit gets destroyed, it is 1000% not my problem and not my fault
+   - if your shit gets destroyed, it is 1000% not my problem and not my fault
      lmao
      - that said, that's an extremely unlikely outcome, please don't let this
        liability bulletpoint scare you
@@ -414,7 +420,9 @@
       #+BEGIN_SRC sh
         archroot /mnt
       #+END_SRC
-      - we are now in the arch install and no longer "in" the liveusb
+
+      we are now in the arch install and no longer "in" the liveusb
+
       - install important packages
         - we have access to things, like wifi, that are not yet actually
           configured yet on the operating system, thus we should take advantage
@@ -423,9 +431,24 @@
           who know more about arch than I do
         - for a fact will want to install all the packages in relation to wifi
           if you do not have an adapter like me.
-          #+BEGIN_SRC 
+          #+BEGIN_SRC sh
             pacman -S wpa_supplicant networkmanager network-manager-applet dialogue 
           #+END_SRC
+        - packages for intel microcode drivers, *important*
+          - microcode is key to stability and patching issues with intel
+            processors that is released as proprietary code. The linux kernal
+            can do this directly for us.
+          - need to modify ~/etc/pacman.conf~
+          - it will have two lines commented out regarding ~multilib, uncomment
+            them as so:
+            #+BEGIN_SRC conf
+              [multilib]
+              Include = /etc/pacman.d/mirrorlist
+            #+END_SRC
+          - now install intel microcode:
+            #+BEGIN_SRC 
+              pacman -Sy intel-ucode
+            #+END_SRC
         - other packages others recommend:
           #+BEGIN_SRC sh
             pacman -S linux-headers linux-lts linux-lts-headers
@@ -516,6 +539,7 @@
             #+BEGIN_SRC conf
               title Arch Linux
               linux /vmlinuz-linux # not a typo
+              initrd /intel-ucode.img # this must come before the entry immediately below
               initrd /initramfs-linux.img # what we made with mkinitcpio -p linux
               options cryptdevice=UUID=long-alphanumerica-string-WITHOUT-QUOTES:cryptlvm root=/dev/mapper/main_group-root quiet rw
             #+END_SRC
@@ -542,20 +566,109 @@
     
    .... we aren't done yet :~) 🎉🎉🎉
 
-   1. reconfigure our wifi
-      - i hope you installed those wifi packages i told you to install and or
-        you have a lan connection
-      - refollow the steps we did above for wifi to regain our connection
-   2. reconfigure our mirror list
-      - again, do as we did before with ~/etc/pacman.d/mirrorlist~
-   3. configure locale.gen and time
-      1. enter ~/etc/locale.gen~
-         - we need to tell arch what our locale is by going to the line and
-           uncommenting our respective locale
-           - usa peeps will use the line ~en_US.UTF-8 UTF8~
-      2. run ~locale-gen~
-      3. sync our clock with ~hwclock --systohc --utc~
-   4. change password for root with ~passwd~
-      - self explanatory, but know this is the password exclusively for
-        ~root~, not for your own user you'll make later who will have sudo
-        user privileges.
+   1. utilities
+      1. wifi
+         - i hope you installed those wifi packages i told you to install and or
+           you have a lan connection
+         - refollow the steps we did above for wifi to regain our connection
+      2. reconfigure our mirror list
+         - again, do as we did before with ~/etc/pacman.d/mirrorlist~
+      3. configure locale.gen and time
+         1. enter ~/etc/locale.gen~
+            - we need to tell arch what our locale is by going to the line and
+              uncommenting our respective locale
+              - usa peeps will use the line ~en_US.UTF-8 UTF8~
+         2. run ~locale-gen~
+         3. run ~localectl set-locale LANG="en_US.UTF-8"~
+            - this is separate from step 2.
+            - some applications need it because they won't respect the changes
+              brought by step #2
+         4. sync our clock with ~hwclock --systohc --utc~
+      4. change password for root with ~passwd~
+         - self explanatory, but know this is the password exclusively for
+           ~root~, not for your own user you'll make later who will have sudo
+           user privileges.
+   2. touchpad, xorg, and graphics drivers
+      I am choosing to not use wayland because while it is the future of linux
+      desktop management, it is still not 100% ready for userland.
+
+      1. touchpad install
+         #+BEGIN_SRC sh
+           pacman -S xf86-input-libinput
+         #+END_SRC
+      2. xorg
+         #+BEGIN_SRC sh
+           pacman -S xorg-server xorg-xinit xorg-apps mesa xterm
+         #+END_SRC
+         - we need xterm in addition to xorg if we want to have a minimally
+           functional deskto a la ~twm~ windows manager that xorg default
+           supports
+
+      3. intel drivers
+         - to my knowledge, we only have 32 bit drivers in case you are
+           wondering why we are instaling 32 bit drivers /shrug 
+          
+           #+BEGIN_SRC sh
+             pacman -S xf86-video-intel lib32-intel-dri lib32-mesa lib32-libgl
+           #+END_SRC
+
+         - at this point, if you want, you can use a very primitive GUI via
+           ~twm~, which is the default tiling window manager of xorg. To do
+           this, simply run ~startx~. If it looks weird and ugly, it worked.
+           - personally, i'm going to stay in the default tty shell.
+
+      4. configuring sudo, adding a user, disabling root
+
+         1. install ~sudo~
+            - i am not joking, arch does not come with ~sudo~ by default
+              #+BEGIN_SRC sh
+                pacman -S sudo
+              #+END_SRC
+
+         2. enable sudo for other users via ~visudo~
+            - it is bad to edit the sudoers file with a normal editor. ~visudo~
+              makes a temporary file and checks that any edits are
+              syntactically correct before saving and affecting the changes.
+            - we need to uncomment the following line:
+            #+BEGIN_SRC shell
+              ## Uncomment to allow members of group wheel to execute any command
+              # %wheel ALL=(ALL) ALL # <-- this line if its now clear enough, fam
+            #+END_SRC
+            - make sure to not uncomment the one after this one, they have
+              somewhat similar contents but are not the same ofc
+            - visudo uses vi by *default*. If you do not know how to use vi,
+              simply execute the following to use nano instead:
+              #+BEGIN_SRC sh
+                EDITOR=nano visudo
+              #+END_SRC
+         3. creating new user
+            - make your actual user account with the following, substituting
+              your desired name:
+              #+BEGIN_SRC sh
+                useradd -m -G wheel -s /bin/bash <NAME>
+              #+END_SRC
+            - give your new user a password
+              #+BEGIN_SRC sh
+                passwd <NAME>
+              #+END_SRC
+            - reboot (or just exit, but I like being sure) your machine, and
+              make sure you can login as your new user.
+              - *this is critical before we disable root*
+                - otherwise risk not being to log back in
+         4. disable root login
+            - you don't have to do this, but I think it is a good security
+              practice to have
+              - makes it much much harder to get into your machine by making
+                adversaries guess the username itself in addition to 
+              - if you are enabling ssh, i believe this does not effect that,
+                so make sure to disable root logins via ssh as well.
+            - as your new user, simple execute:
+              #+BEGIN_SRC sh
+                sudo passwd -l root
+              #+END_SRC
+              - exit and retry to login as root, should no longer be able to
+                - it'll show "login incorrect" errors even when using the
+                  correct password for root user
+** desktop environment
+   
+   still not done :~)
