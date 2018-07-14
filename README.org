@@ -698,10 +698,93 @@
     now load. Nice!
     - whenever you reboot your laptop, you will need to execute ~startx~ to get
       your desktop. If you don't want the hassle, then....
+*** fonts :~)
+    fonts, and how they work, is actually one of the more confusing things i
+    encountered during this journey
+      - partitioning drives and encrypting them makes much more sense vs font
+        configurations in retrospect
+        - the following should help you get some very nice looking fonts on your
+          computer along with full emoji support more or less
+        - completely ripped from a reddit post [[https://www.reddit.com/r/archlinux/comments/5r5ep8/make_your_arch_fonts_beautiful_easily/][here]]
+
+      - install the fonts
+
+        #+BEGIN_SRC sh
+          pacman -S ttf-dejavu ttf-liberation noto-fonts
+        #+END_SRC
+
+      - enable font presets
+
+        #+BEGIN_SRC sh
+          sudo ln -s /etc/fonts/conf.avail/70-no-bitmaps.conf /etc/fonts/conf.d
+          sudo ln -s /etc/fonts/conf.avail/10-sub-pixel-rgb.conf /etc/fonts/conf.d
+          sudo ln -s /etc/fonts/conf.avail/11-lcdfilter-default.conf /etc/fonts/conf.d
+        #+END_SRC
+
+      - create a file, ~/etc/fonts/local.conf~ with following:
+        
+        #+BEGIN_SRC html
+            <?xml version="1.0"?>
+            <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+            <fontconfig>
+                <match>
+                    <edit mode="prepend" name="family"><string>Noto Sans</string></edit>
+                </match>
+                <match target="pattern">
+                    <test qual="any" name="family"><string>serif</string></test>
+                    <edit name="family" mode="assign" binding="same"><string>Noto Serif</string></edit>
+                </match>
+                <match target="pattern">
+                    <test qual="any" name="family"><string>sans-serif</string></test>
+                    <edit name="family" mode="assign" binding="same"><string>Noto Sans</string></edit>
+                </match>
+                <match target="pattern">
+                    <test qual="any" name="family"><string>monospace</string></test>
+                    <edit name="family" mode="assign" binding="same"><string>Noto Mono</string></edit>
+                </match>
+            </fontconfig>
+        #+END_SRC
+
+      - then go to Fonts (use KDE's search bar, accessible via the bottom left
+        button on the desktop panel), and make sure the edits are reflected
+        there, i.e. that you now have Noto Sans as your font for everything
+        minus fixed width text, which should be Hack.
+
+      - you can do more edits to tweak fonts to your liking here.
+
+      - resetting the computer should make sure the edits take full effect
+        across all apps, etc.
 
 *** emacs :~)
-    1. ispell
+    1. ispell doesn't work by default because the required programs aren't
+       installed. let's fix that:
        #+BEGIN_SRC sh
-         pacman -S aspell-en # ispell didn't work for some reason, so future it is
+         pacman -S aspell-en # ispell didn't work for some reason, so we use its successor.
        #+END_SRC
+    2. emojis don't work by default, install and run ~emojify-mode~
+       - forgot that you need to install ~emojify~ (which I had) but also
+         manually run it to actually display them (or enable them globally).
+*** gpg and ssh
+    1. ssh
+       - don't yell at me i know that it's probably not the best thing that I do
+         this, but in my personal defense it is only for personal projects and my
+         own servers
+       - say you have an ssh key you would like to use on your new install:
+         1. first, install ~openssh~
+         2. execute the following:
+            #+BEGIN_SRC sh
+              mkdir ~/.ssh
+              cp <private key> ~/.ssh/<private key>
+              cp <public key> ~/.ssh/<public key>.pub
+              chmod 700 ~/.ssh
+              chmod 600 ~/.ssh/<private key>
+              chmod 600 ~/.ssh/<public key>.pub
+            #+END_SRC
+    2. gpg
+       1. install gpg
+          - should already be installed but yeah
+       2. import the key:
+          #+BEGIN_SRC sh
+            gpg --import <gpg key>
+          #+END_SRC
 ** 
