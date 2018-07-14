@@ -562,7 +562,7 @@
         as ~root~ and press enter for the password, seeing as we have yet to
         make one.
 
-** loose ends
+** drivers, wifi, sudo user
     
    .... we aren't done yet :~) 🎉🎉🎉
 
@@ -588,6 +588,12 @@
          - self explanatory, but know this is the password exclusively for
            ~root~, not for your own user you'll make later who will have sudo
            user privileges.
+      5. as of now, you will have to manually connect to wifi access points.
+         - tools like ~wifi-menu~ help you find access points
+         - it will also help you make a config for it. even if the initial
+           connection attempt fails, preserve the config (it'll ask you) and go
+           in to edit it. ~wifi-menu~ will then be able to use the corrected
+           config the next time you try.
    2. touchpad, xorg, and graphics drivers
       I am choosing to not use wayland because while it is the future of linux
       desktop management, it is still not 100% ready for userland.
@@ -669,6 +675,33 @@
               - exit and retry to login as root, should no longer be able to
                 - it'll show "login incorrect" errors even when using the
                   correct password for root user
-** desktop environment
-   
-   still not done :~)
+** loose ends: desktop stuff, etc
+*** desktop environment
+    still not done :~)
+
+    we will go for kde5 plasma for now because it is absolutely gorgeous, is not
+    bloated, and is easy to get accustomed to. i may possibly add an addendum
+    for a tiling wm like dwm if I can get it figured out.
+
+    #+BEGIN_SRC sh
+      pacman -S plasma-meta kde-applications # don't do the last if you don't want kde apps, i do, though.
+    #+END_SRC
+    - this might take a quick minute given the total DL is about ~3gb iirc
+
+    now we need to enable it by creating a ~.xinitrc~ file in our home with the
+    following content:
+    #+BEGIN_SRC sh
+      echo "exec startkde" >> .xinitrc
+    #+END_SRC
+
+    to use your beautiful new desktop, simply execute ~startx~ and KDE should
+    now load. Nice!
+    - whenever you reboot your laptop, you will need to execute ~startx~ to get
+      your desktop. If you don't want the hassle, then....
+
+*** emacs :~)
+    1. ispell
+       #+BEGIN_SRC sh
+         pacman -S aspell-en # ispell didn't work for some reason, so future it is
+       #+END_SRC
+** 
