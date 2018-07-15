@@ -699,6 +699,15 @@
     now load. Nice!
     - whenever you reboot your laptop, you will need to execute ~startx~ to get
       your desktop. If you don't want the hassle, then....
+**** kde discover
+     - KDE discover is the DE's app store. It won't work fully by default
+       because of how arch handles its applications. You need to install the
+       following for it to work as expected:
+       #+BEGIN_SRC sh
+         pacman -S packagekit-qt5
+       #+END_SRC
+       - you may still get an error about ~parley.knsrc~, from what I can tell
+         and searching online, this is """harmless""".
 *** fonts :~)
     fonts, and how they work, is actually one of the more confusing things i
     encountered during this journey
