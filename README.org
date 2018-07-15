@@ -459,13 +459,14 @@
           - additionally, we are installing the headers for both the current
             kernal and the lts kernal: these are useful for other packages that
             need to link/bind against them for development purposes, etc.
-        - finally, we install another useful operating system:
+        - we install another useful operating system:
           #+BEGIN_SRC sh
             pacman -S emacs
           #+END_SRC
           - .... or vim if that's your choice.... definitely more efficient
             memory wise
           - c.f. i will /die/ before i give up my elisp
+        - you should probably also install tools like ~git~
    3. modify ~/etc/mkinitcpio.conf~ to enable encryption
       - as with most things in this guide, taken directly from the wiki.
       - there is a variable in here named ~HOOKS~, which the file makes clear
@@ -787,4 +788,47 @@
           #+BEGIN_SRC sh
             gpg --import <gpg key>
           #+END_SRC
+*** AUR and aurman
+    - AUR is the Arch User Repository, and it holds a bunch of additional
+      packages that pacman does not have (or customized in different ways, etc).
+    - ~aurman~ is a AUR Helper, a tool that helps to install packages hosted up
+      on AUR
+      - it is really good to look into how AUR works and how to do AUR installs
+        on your own for the sake of being able to help yourself when something
+        breaks, etc
+    - to install ~aurman~:
+      - first, we need to install the PGP key of the author:
+        #+BEGIN_SRC sh
+          curl -sSL https://github.com/polygamma.gpg | gpg --import -
+        #+END_SRC
+        - this simply downloads the author's key and imports it directly into
+          your GPG keychain
+      - now install ~aurman~
+        - it is common advise to make a specific directory where you can go
+          download and install your AUR packages, so:
+      #+BEGIN_SRC sh
+        mkdir ~/aur_pkg
+        cd aur_pkg
+        git clone https://aur.archlinux.org/aurman.git
+        cd aurmen/
+        makepkg -si # DO NOT USE SUDO HERE
+      #+END_SRC
+    - to search for a package on AUR and install, it is just like with pacman:
+      #+BEGIN_SRC sh
+        aurman -Ss <query> # search
+        aurman -S <pkg> # install
+      #+END_SRC
+      - pls go see how it works in its totality: https://github.com/polygamma/aurman
+        - make sure to checkout the install scripts/configs you are using
+        - some malware was recently discovered on AUR
+        - this should not be surprising: bad people are everywhere and the arch
+          community has been saying for years to make sure to check the code
+          you use before compiling it on your system
+        - not your mom, tho, help the CCP or NSA run botnets for all i care man
+      - example, I use [[https://spideroak.com/one/][spideroak one]] as private, encrypted, and more
+        trustworthy dropbox service, and there is a maintained AUR install for
+        it:
+        #+BEGIN_SRC sh
+          aurman -S spideroak-one # ta-da
+        #+END_SRC
 ** 
