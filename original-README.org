@@ -18,7 +18,7 @@
   Kozikowski]], and [[https://delta-xi.net][Erik Sonnleitner]]. ya'll helped a homie get arch working on
   this kickass computer.
 
-** why you should or should not install arch                            :TOC:
+** why you should or should not install arch
    1. Pros
       - you can learn a small bit about how linux and operating systems work
       - very up to date software
@@ -48,7 +48,7 @@
         - arch doesn't actually require that, but it is so tempting to do and
           thus a danger
 
-** disclaimer (sacrifices, incantations, don't sue me, etc.)            :TOC:
+** disclaimer (sacrifices, incantations, don't sue me, etc.)           
    since we are installing arch, there a a few precautions you'll want to
    take/keep in mind:
    1. if your shit gets destroyed, it is 1000% not my problem and not my fault
@@ -65,7 +65,7 @@
    3. put aside like 2-4 hours for this depending on how inexperienced you are
      - just keep this in mind and or be somewhere you can stop and leave your laptop
        plugged in on the chance you need to do something else
-** live usb                                                             :TOC:
+** live usb                                                            
    1. download the img from https://www.archlinux.org/download/
       - torrent is faster, also remember to seed
       - alternatively just dl the iso directly, slightly slower
@@ -114,7 +114,7 @@
          
    If everything went well, we will now boot into the arch iso. 
 
-** setting up to install                                                :TOC:
+** setting up to install
    you are going to need to be familiar with vim, nano, pico, emacs, idc,
    something, this is on you, fam.
 
@@ -269,7 +269,7 @@
                 #+BEGIN_SRC sh
                   ip link set <INTERFACE> down
                 #+END_SRC
-** freeze: partition time!                                              :TOC:
+** freeze: partition time!
    that was a bad joke jesus christ forgive me
 
    1. make sure we have (U)EFI
@@ -343,7 +343,7 @@
            - ~y~
              - *we just wrote to disk. goodbye everything else*
 
-** encryption and mounting                                              :TOC:
+** encryption and mounting
    1. encryption with ~cryptsetup~
       - make sure to use our *second partition*
         - *not* our EFI partition
