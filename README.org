@@ -2,7 +2,7 @@
 
   i am so sorry for this guide.
 
-  <p align="center"><img src="[[https://raw.githubusercontent.com/ejmg/an-idiots-guide-to-installing-arch-on-a-lenovo-carbon-x1-gen-6/master/dumb-pic-2.jpeg]]"/></p>
+  [[https://raw.githubusercontent.com/ejmg/an-idiots-guide-to-installing-arch-on-a-lenovo-carbon-x1-gen-6/master/dumb-pic-2.jpeg]]
 
   this is an attempt at a comprehensive, start to finish, install guide for
   lenovo's 6th gen carbon x1. my model is the 20KG-0022US, which I bought from
@@ -60,7 +60,7 @@
      erotic ambient music so that we may pray to stallman that this goes
      smoothly
 
-     [[./stallman-dot-png.jpg][st. ignucius, may he guide us]]
+     [[https://raw.githubusercontent.com/ejmg/an-idiots-guide-to-installing-arch-on-a-lenovo-carbon-x1-gen-6/master/stallman-dot-png.jpg][st. ignucius, may he guide us]]
 
    3. put aside like 2-4 hours for this depending on how inexperienced you are
      - just keep this in mind and or be somewhere you can stop and leave your laptop
