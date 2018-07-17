@@ -840,4 +840,47 @@
         #+BEGIN_SRC sh
           aurman -S spideroak-one # ta-da
         #+END_SRC
-** 
+** lenovo x1c6 stuff
+   1. cpu throttling
+      - so turns out there is some unfortunate fuckery with Lenovo thinkpad
+        cpu's right now
+      - artificially throttled while underload because of misaligned temp
+        values
+      - lets install a script that fixes this
+        #+BEGIN_SRC sh
+          aurman -S lenovo-throttling-fix-git
+          sudo systemctl enable --now lenovo_fix.service
+        #+END_SRC
+        - usual warnings apply about this not being endorsed by lenovo, etc etc
+        - lenovo i love you, please stop hurting us like this
+        - please look at the script yourself, see the options you have: https://github.com/erpalma/lenovo-throttling-fix
+   2. s3 vs s0i3 sleep state
+      - this is a lot trickier and i won't be walking you through this
+      - tl;dr, MCSFT is pushing a new sleep state standard, s0i3, that makes laptop behave more
+        akin to phones
+        - pros: they can do stuff like connect to wifi, update, and refresh
+          user data while asleep
+        - cons: massively more energy use
+      - lenovo decided to support this: okay, fine
+        - ... but also decided to completely remove support for previous
+          format, S3
+          - wait, *why, lenovo, why??????*
+      - Making matters worse: neither are now properly supported by linux
+        because of lenovo's implementation, you need to apply a patch fix
+        either way
+        - it involves patching the kernal or editing boot configs
+        - didn't mention them earlier because this is an idiot's guide and i
+          didn't want to overwhelm you
+          - i was also overwhelmed, i was the idiot
+      - reference the wiki, make your decision:
+        - if you want to return to S3, follow this guide: https://delta-xi.net/#056
+*** patching for S3 support
+    - *first and foremost, mention BIOS update*
+    - make it clear that we edit the PATCH FILE not the dsl that is assembled
+      from the asl.
+    - in particular, recall the latter two parameters of ~OperationRegion
+      (GNVS, SystemMemory, 0x4FF4E000, 0x0771)~, which need to match those
+      found in the dsl.
+    - changes to ~arch.conf~
+*** bios update
+    - wiki page did us nothing wrong
