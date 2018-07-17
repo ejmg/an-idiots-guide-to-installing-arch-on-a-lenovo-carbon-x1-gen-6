@@ -2,40 +2,69 @@
 
   i am so sorry for this guide.
 
-  this is an attempt at a comprehensive, front to back, install guide for
+  ![the whip](https://www.github.com/ejmg/an-idiots-guide-to-installing-arch-on-a-lenovo-carbon-x1-gen-6/master/dumb-pic-2.jpeg)
+
+  this is an attempt at a comprehensive, start to finish, install guide for
   lenovo's 6th gen carbon x1. my model is the 20KG-0022US, which I bought from
-  Costco, and comes with an 8th gen intel i7, 16gb ram, and 512gb PCIe ssd. My
+  costco, and comes with an 8th gen intel i7, 16gb ram, and 512gb ssd. My
   instructions will thus have mentions of specific components from this
-  laptops as they appear in the guide, but I will try to make it clear when
+  laptops as they appear in the guide, but i will try to make it clear when
   such a case may not hold for others with respect to 6th gen x1 versions.
 
   i want to make a shoutout to specific sources for informing this guide. it's
   the result of mashing together and cross referencing the wiki with multiple
-  tutorials and guides where I would verify instructions and install
-  strategies. Included in this list is [[https://www.youtube.com/channel/UCxQKHvKbmSzGMvUrVtJYnUA][LearnLinux.tv]], [[https://www.youtube.com/channel/UCNgMPxqWds9IYR_QFNPButw][Kai Hendry]], [[https://www.youtube.com/channel/UCNgMPxqWds9IYR_QFNPButw][Lucas
-  Alvares Gomes]], [[https://ticki.github.io/blog/setting-up-archlinux-on-a-lenovo-yoga/][Ticki]], and [[https://kozikow.com/2016/06/03/installing-and-configuring-arch-linux-on-thinkpad-x1-carbon/#Disable-secure-boot][Robert Kozikowski]]. ya'll helped a homie.
+  guides where I would verify instructions and install strategies. Included in
+  this list is [[https://www.youtube.com/channel/UCxQKHvKbmSzGMvUrVtJYnUA][LearnLinux.tv]], [[https://www.youtube.com/channel/UCNgMPxqWds9IYR_QFNPButw][Kai Hendry]], [[https://www.youtube.com/channel/UCNgMPxqWds9IYR_QFNPButw][Lucas Alvares Gomes]], [[https://ticki.github.io/blog/setting-up-archlinux-on-a-lenovo-yoga/][Ticki]], [[https://kozikow.com/2016/06/03/installing-and-configuring-arch-linux-on-thinkpad-x1-carbon/#Disable-secure-boot][Robert
+  Kozikowski]], and [[https://delta-xi.net][Erik Sonnleitner]]. ya'll helped a homie get arch working on
+  this kickass computer.
 
-** sacrifices, incantations
+** why you should or should not install arch
+   1. Pros
+      - you can learn a small bit about how linux and operating systems work
+      - very up to date software
+      - access to things like AUR
+      - run a very lightweight system that, outside of even more niche and
+        esoteric operating systems, avoids bloat and waste
+      - want something extremely sad and nerdy to """brag about""" (don't do this)
+   2. Cons
+      - my friend Chris Allen made a PR wiping the entire fucking guide and
+        simply suggesting you Don't Install Arch
+        - the man has a /solid/ point
+      - it can take a lot of time to get going
+        - this is assuming your hardware (non X1C6) is well supported or
+          doesn't have some proprietary code that throws you into kernel h e l l
+        - you could equally do something better with your time, like sleep,
+          call your mom, or, idk, hangout with friends if you have those.
+        - not proud of this, but it took me like 8 hours to get it all right
+          for the first time. i'm an idiot, though. ergo, /idiot's guide/
+      - it has the most up to date packages, which translates to instability
+        and things breaking more often
+        - if you do software, this is actually something you often don't want
+          outside of maybe what you work on the most.
+      - ricing
+        - this is just the time point again
+        - but really, what good does it serve you to be constantly tweaking your
+          configurations and init files and thus constantly having to fix them
+        - arch doesn't actually require that, but it is so tempting to do and
+          thus a danger
+
+** disclaimer (sacrifices, incantations, don't sue me, etc.)            :TOC:
    since we are installing arch, there a a few precautions you'll want to
    take/keep in mind:
-   - if your shit gets destroyed, it is 1000% not my problem and not my fault
+   1. if your shit gets destroyed, it is 1000% not my problem and not my fault
      lmao
      - that said, that's an extremely unlikely outcome, please don't let this
        liability bulletpoint scare you
-   - you may want to form a pentagram with some usb cords, placing a copy of
+   2. you may want to form a pentagram with some usb cords, placing a copy of
      the GNU GPLv3 license at its center, and playing some soft but slightly
      erotic ambient music so that we may pray to stallman that this goes
      smoothly
 
      [[./stallman-dot-png.jpg][st. ignucius, may he guide us]]
 
-   - put aside like 2-4 hours for this depending on how inexperienced you are
-     - this took me a quick minute because i would double check input text
-       before executing a command, cross referencing what wikis/videos said to
-       do to make sure they were right and i understand what was happening, etc.
+   3. put aside like 2-4 hours for this depending on how inexperienced you are
      - just keep this in mind and or be somewhere you can stop and leave your laptop
        plugged in on the chance you need to do something else
-
 ** live usb
    1. download the img from https://www.archlinux.org/download/
       - torrent is faster, also remember to seed
@@ -79,7 +108,7 @@
    If everything went well, we will now boot into the arch iso. 
 
 ** setting up to install
-   You are going to need to be familiar with vim, nano, pico, emacs, idc,
+   you are going to need to be familiar with vim, nano, pico, emacs, idc,
    something, this is on you, fam.
 
    1. configure our mirrors to download software from
@@ -100,117 +129,139 @@
         #+END_SRC
         - we will now have (hopefully) fast downloads for our packages
    2. configure wifi (skippable?)
-      - x1 does not have a ether port, but adaptors exist
-        - these adaptors supposedly work without issue but I don't have one,
-          so I'm assuming you don't either
-        - dilemma: we don't have fucking internet by default
-        - solution: ~netctl~
-      - find the name of your wifi card device
-        - I would assume x1's have the same name, but who knows:
-          #+BEGIN_SRC sh
-            ip link
-          #+END_SRC
-        - mine was ~wlp2s0~, arch wiki suggests that anything that starts with
-          a ~w~ is probably the wifi card
-      - figure out the wifi point you are going to use.
-        - I'm going to assume it is either of "simple" wpa or wpa-enterprise
-          - the latter is at corporate or university settings if that helps
-          - luckily ~netctl~ provides templates for both. copy the appropriate
-            one and place it in the root of ~netctl~ as so:
-            #+BEGIN_SRC sh
-              # simple wpa, such as home routers
-              cp /etc/netctl/examples/wireless-wpa /etc/netctl/<NAME-YOU-WANT-TO-GIVE-IT>
+      1. x1 does not have a ether port, but adaptors exist
+         - these adaptors supposedly work without issue but I don't have one,
+           so I'm assuming you don't either
+         - dilemma: we don't have fucking internet by default
+         - solution: ~netctl~
+      2. find the name of your wifi card device
+         - I would assume x1's have the same name, but who knows:
+           #+BEGIN_SRC sh
+             ip link
+           #+END_SRC
+         - mine was ~wlp2s0~, arch wiki suggests that anything that starts with
+           a ~w~ is probably the wifi card
+      3. figure out the wifi point you are going to use.
+         - I'm going to assume it is either of "simple" wpa or wpa-enterprise
+           - the latter is at corporate or university settings if that helps
+           - luckily ~netctl~ provides templates for both. copy the appropriate
+             one and place it in the root of ~netctl~ as so:
+             #+BEGIN_SRC sh
+               # simple wpa, such as home routers
+               cp /etc/netctl/examples/wireless-wpa /etc/netctl/<NAME-YOU-WANT-TO-GIVE-IT>
 
-              # enterprise wpa
-              cp /etc/netctl/examples/wireless-wpa-configsection /etc/netctl/<NAME-YOU-WANT-TO-GIVE-IT>
-            #+END_SRC
-          - ~wireless-wpa~ looks like this:
-            #+BEGIN_SRC conf
-              Description='A simple WPA encrypted wireless connection'
-              Interface=wlan0
-              Connection=wireless
+               # enterprise wpa
+               cp /etc/netctl/examples/wireless-wpa-configsection /etc/netctl/<NAME-YOU-WANT-TO-GIVE-IT>
+             #+END_SRC
+           - ~wireless-wpa~ looks like this:
+             #+BEGIN_SRC conf
+               Description='A simple WPA encrypted wireless connection'
+               Interface=wlan0
+               Connection=wireless
 
-              Security=wpa
-              IP=dhcp
+               Security=wpa
+               IP=dhcp
 
-              ESSID='MyNetwork'
-              # Prepend hexadecimal keys with \"
-              # If your key starts with ", write it as '""<key>"'
-              # See also: the section on special quoting rules in netctl.profile(5)
-              Key='WirelessKey'
-              # Uncomment this if your ssid is hidden
-              #Hidden=yes
-              # Set a priority for automatic profile selection
-              #Priority=10
-            #+END_SRC
-          - ~wireless-wpa-configsection~ looks like this:
-            #+BEGIN_SRC conf
-              Description='A wireless connection using a custom network block configuration'
-              Interface=wlan0
-              Connection=wireless
-              Security=wpa-configsection
-              IP=dhcp
-              WPAConfigSection=(
-                  'ssid="University"'
-                  'key_mgmt=WPA-EAP'
-                  'eap=TTLS'
-                  'group=TKIP'
-                  'pairwise=TKIP CCMP'
-                  'anonymous_identity="anonymous"'
-                  'identity="myusername"'
-                  'password="mypassword"'
-                  'priority=1'
-                  'phase2="auth=PAP"'
-              )
-            #+END_SRC
-          - *in both cases*:
-            - ~Interface~ takes the value of the wifi card device name we
-              found earlier
-            - ~Security~, ~Connection~, and ~IP~ remain untouched
-            - Do what you will with ~Description~
-          - For vanilla ~wireless-wpa~, the config explains itself:
-            - ~ESSID~ is the name of your wifi access point
-            - ~Key~ is the password
-          - For ~wireless-wpa-configsection~, things can be trickier:
-            - ~ssid~ is access point
-            - ~key_mgmt~ should remain untouched in most cases
-            - ~eap~ is entirely dependent on your case, for many (aka
-              including me), it is ~PEAP~
-            - ~pairwise~ is dependent on your situation (i did not need it)
-            - ~anonymous_identity~ is dependent on your situation (i did not need it)
-            - ~password~ is password
-            - ~priority~ is dependent on your situation (i did not need it)
-            - ~phase2~ is dependent on your situation (i did not need it)
-            - if my list appears not very useful in terms of help and
-              explanation, then you understand the very nature of who is
-              writing it and i'm so sorry i'm trying
-            - example ~wireless-wpa-configsection~ i actually used (with
-              values obviously substituted in):
-              #+BEGIN_SRC conf
-                Description='lol'
-                Interface=wlp2s0
-                Connection=wireless
-                Security=wpa-configsection
-                IP=dhcp
-                WPAConfigSection=(
-                    'ssid="wutang"'
-                    'key_mgmt=WPA-EAP'
-                    'eap=PEAP'
-                    'identity="ghostfacekillah"'
-                    'password="suuuuuuuuuuuuu69"'
-                )
-              #+END_SRC
-      - save your config file, time to connect:
-        #+BEGIN_SRC sh
-          netctl start <NAME-OF-YOUR-WIFI-PROFILE>
-        #+END_SRC
-        - it should take like 3 seconds to connect
-        - if nothing happens, it worked
-        - check with a quick ~ping 8.8.8.8~, if packets are shooting out, you
-          got internet.
-          - otherwise, diagnose with ~journalctl -xe~ and use those arch wikis
-            and forums! welcome to arch :)))))))))))))))))
+               ESSID='MyNetwork'
+               # Prepend hexadecimal keys with \"
+               # If your key starts with ", write it as '""<key>"'
+               # See also: the section on special quoting rules in netctl.profile(5)
+               Key='WirelessKey'
+               # Uncomment this if your ssid is hidden
+               #Hidden=yes
+               # Set a priority for automatic profile selection
+               #Priority=10
+             #+END_SRC
+           - ~wireless-wpa-configsection~ looks like this:
+             #+BEGIN_SRC conf
+               Description='A wireless connection using a custom network block configuration'
+               Interface=wlan0
+               Connection=wireless
+               Security=wpa-configsection
+               IP=dhcp
+               WPAConfigSection=(
+                   'ssid="University"'
+                   'key_mgmt=WPA-EAP'
+                   'eap=TTLS'
+                   'group=TKIP'
+                   'pairwise=TKIP CCMP'
+                   'anonymous_identity="anonymous"'
+                   'identity="myusername"'
+                   'password="mypassword"'
+                   'priority=1'
+                   'phase2="auth=PAP"'
+               )
+             #+END_SRC
+           - *in both cases*:
+             - ~Interface~ takes the value of the wifi card device name we
+               found earlier
+             - ~Security~, ~Connection~, and ~IP~ remain untouched
+             - Do what you will with ~Description~
+           - For vanilla ~wireless-wpa~, the config explains itself:
+             - ~ESSID~ is the name of your wifi access point
+             - ~Key~ is the password
+           - For ~wireless-wpa-configsection~, things can be trickier:
+             - ~ssid~ is access point
+             - ~key_mgmt~ should remain untouched in most cases
+             - ~eap~ is entirely dependent on your case, for many (aka
+               including me), it is ~PEAP~
+             - ~pairwise~ is dependent on your situation (i did not need it)
+             - ~anonymous_identity~ is dependent on your situation (i did not need it)
+             - ~password~ is password
+             - ~priority~ is dependent on your situation (i did not need it)
+             - ~phase2~ is dependent on your situation (i did not need it)
+             - if my list appears not very useful in terms of help and
+               explanation, then you understand the very nature of who is
+               writing it and i'm so sorry i'm trying
+             - example ~wireless-wpa-configsection~ i actually used (with
+               values obviously substituted in):
+               #+BEGIN_SRC conf
+                 Description='lol'
+                 Interface=wlp2s0
+                 Connection=wireless
+                 Security=wpa-configsection
+                 IP=dhcp
+                 WPAConfigSection=(
+                     'ssid="wutang"'
+                     'key_mgmt=WPA-EAP'
+                     'eap=PEAP'
+                     'identity="ghostfacekillah"'
+                     'password="suuuuuuuuuuuuu69"'
+                 )
+               #+END_SRC
+      4. save your config file, time to connect:
+         #+BEGIN_SRC sh
+           netctl start <NAME-OF-YOUR-WIFI-PROFILE>
+         #+END_SRC
+         - it should take like 3 seconds to connect
+         - if nothing happens, it worked
+         - check with a quick ~ping 8.8.8.8~, if packets are shooting out, you
+           got internet.
+           - otherwise, diagnose with ~journalctl -xe~ and use those arch wikis
+             and forums! welcome to arch :)))))))))))))))))
+      5. debugging advise:
+         - i did not run into this during install time, but when i later
+           tried to connect to wifi, a few different commands came in handy
+           to debug my situation:
+           1. stop previous connection
+              - can't have more than one ~netctl~ service going, so:
+                #+BEGIN_SRC sh
+                  netctl stop <PROFILE>
+                #+END_SRC
 
+           2. systemctl fuckery
+              - systemctl sometimes gets in the way with its service/handling
+                of netctl, stop it
+                #+BEGIN_SRC sh
+                  systemctl stop netctl@<PROFILE>.service
+                #+END_SRC
+
+           3. ip link may have your services as ~up~, put them as ~down~
+              - ~netctl~ does not like it when your link is up before it runs,
+                so turn it off:
+                #+BEGIN_SRC sh
+                  ip link set <INTERFACE> down
+                #+END_SRC
 ** freeze: partition time!
    that was a bad joke jesus christ forgive me
 
@@ -698,7 +749,14 @@
     to use your beautiful new desktop, simply execute ~startx~ and KDE should
     now load. Nice!
     - whenever you reboot your laptop, you will need to execute ~startx~ to get
-      your desktop. If you don't want the hassle, then....
+      your desktop. If you don't want the hassle, then put this in your ~.profile~
+      once you know your desktop starts as expected with ~startx~:
+      #+BEGIN_SRC sh
+        if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
+          exec startx
+        fi
+      #+END_SRC
+      - more stuff on customizing xorg startup: https://wiki.archlinux.org/index.php/Xinit
 **** kde discover
      - KDE discover is the DE's app store. It won't work fully by default
        because of how arch handles its applications. You need to install the
@@ -841,8 +899,6 @@
           aurman -S spideroak-one # ta-da
         #+END_SRC
 ** lenovo x1c6 stuff
-
-
 *** cpu throttling
     - cpu throttling
       - so turns out there is some unfortunate fuckery with Lenovo thinkpad
