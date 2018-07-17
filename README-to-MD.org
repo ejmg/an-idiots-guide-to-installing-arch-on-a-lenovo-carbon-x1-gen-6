@@ -18,6 +18,47 @@
   Kozikowski]], and [[https://delta-xi.net][Erik Sonnleitner]]. ya'll helped a homie get arch working on
   this kickass computer.
 
+* toc                                                                   :TOC:
+- [[#installing-arch-dot-txt][1 installing arch dot txt]]
+- [[#why-you-should-or-should-not-install-arch][2 why you should or should not install arch]]
+- [[#disclaimer-sacrifices-incantations-dont-sue-me-etc][3 disclaimer (sacrifices, incantations, don't sue me, etc.)]]
+- [[#live-usb][4 live usb]]
+- [[#setting-up-to-install][5 setting up to install]]
+  - [[#configure-our-mirrors-to-download-software-from][configure our mirrors to download software from]]
+  - [[#configure-wifi-optional][configure wifi ("optional")]]
+  - [[#debugging-advise][debugging advise:]]
+- [[#freeze-partition-time][6 freeze: partition time!]]
+  - [[#make-sure-we-have-uefi][make sure we have (U)EFI]]
+  - [[#figure-out-where-our-main-drive-is][figure out where our main drive is]]
+  - [[#partitioning-and-configuring][partitioning and configuring]]
+- [[#encryption-and-mounting][7 encryption and mounting]]
+  - [[#encryption-with-cryptsetup][encryption with ~cryptsetup~]]
+  - [[#generation-of-logical-volumes-within-our-lvm][generation of logical volumes within our LVM]]
+  - [[#format-and-mount-our-logical-partitions][format and mount our logical partitions]]
+- [[#installing-arch-and-setting-it-up-to-boot-and-run][8 installing arch and setting it up to boot and run]]
+  - [[#install-arch-onto-mnt][install arch onto ~/mnt~]]
+  - [[#generate-our-fstab-file][generate our fstab file]]
+  - [[#log-into-arch-and-installing-stuff][log into arch and installing stuff!]]
+  - [[#modify-etcmkinitcpioconf-to-enable-encryption][modify ~/etc/mkinitcpio.conf~ to enable encryption]]
+  - [[#setting-up-the-bootloader-itself][setting up the bootloader itself]]
+  - [[#reboot-and-start-arch][reboot and start arch]]
+- [[#drivers-wifi-sudo-user][9 drivers, wifi, sudo user]]
+  - [[#utilities][utilities]]
+  - [[#touchpad-xorg-and-graphics-drivers][touchpad, xorg, and graphics drivers]]
+  - [[#configuring-sudo-adding-a-user-disabling-root][configuring sudo, adding a user, disabling root]]
+- [[#loose-ends-desktop-stuff-etc][10 loose ends: desktop stuff, etc]]
+  - [[#desktop-environment][desktop environment]]
+  - [[#fonts][fonts]]
+  - [[#emacs][emacs]]
+  - [[#gpg-and-ssh][gpg and ssh]]
+  - [[#aur-and-aurman][AUR and aurman]]
+- [[#other-tweaks-and-lenovo-x1c6-stuff][11 other tweaks and lenovo x1c6 stuff]]
+  - [[#cpu-throttling][cpu throttling]]
+  - [[#bios-update][bios update]]
+  - [[#trimming-ssd][trimming SSD]]
+  - [[#hibernate-support][hibernate support]]
+  - [[#patching-for-s3-support][patching for S3 support]]
+
 * why you should or should not install arch
   1. Pros
      - you can learn a small bit about how linux and operating systems work
