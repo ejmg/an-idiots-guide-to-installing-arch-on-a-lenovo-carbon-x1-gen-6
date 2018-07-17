@@ -18,7 +18,7 @@
   Kozikowski]], and [[https://delta-xi.net][Erik Sonnleitner]]. ya'll helped a homie get arch working on
   this kickass computer.
 
-** why you should or should not install arch
+** why you should or should not install arch                            :TOC:
    1. Pros
       - you can learn a small bit about how linux and operating systems work
       - very up to date software
@@ -27,7 +27,7 @@
         esoteric operating systems, avoids bloat and waste
       - want something extremely sad and nerdy to """brag about""" (don't do this)
    2. Cons
-      - my friend Chris Allen made a PR wiping the entire fucking guide and
+      - my friend Chris Allen made a [[https://github.com/ejmg/an-idiots-guide-to-installing-arch-on-a-lenovo-carbon-x1-gen-6/pull/3][PR wiping the entire fucking guide]] and
         simply suggesting you Don't Install Arch
         - the man has a /solid/ point
       - it can take a lot of time to get going
@@ -65,7 +65,7 @@
    3. put aside like 2-4 hours for this depending on how inexperienced you are
      - just keep this in mind and or be somewhere you can stop and leave your laptop
        plugged in on the chance you need to do something else
-** live usb
+** live usb                                                             :TOC:
    1. download the img from https://www.archlinux.org/download/
       - torrent is faster, also remember to seed
       - alternatively just dl the iso directly, slightly slower
@@ -100,14 +100,21 @@
       - turn on laptop (or hard reset to ensure true "turn off"), press enter
         at lenovo boot screen
       - under Security, you will find the option. Disable it.
-   4. ensure your usb is first in boot order
+   4. (optional) enable Thunerbolt BIOS Assist Mode
+      - this effects the process of enabling S3, which is something at the very
+        end of this guide
+        - if you are going to do that, it saves you a reboot (and it doesn't
+          effect you really either way)
+      - You will find the option under Config
+   5. ensure your usb is first in boot order
       - under Startup, go to boot
-      - using the - and + keys, make sure it is at the top of the list
-      - press F10 to save our configs and exit.
+      - using the ~-~ and ~+~ keys, make sure it is at the top of the list
+        - I had to use ~Shift~ while pressing ~+~ for it to affect
+      - press ~F10~ to save our configs and exit.
          
    If everything went well, we will now boot into the arch iso. 
 
-** setting up to install
+** setting up to install                                                :TOC:
    you are going to need to be familiar with vim, nano, pico, emacs, idc,
    something, this is on you, fam.
 
@@ -262,14 +269,12 @@
                 #+BEGIN_SRC sh
                   ip link set <INTERFACE> down
                 #+END_SRC
-** freeze: partition time!
+** freeze: partition time!                                              :TOC:
    that was a bad joke jesus christ forgive me
 
    1. make sure we have (U)EFI
       - i am doing all of this on the *presumption we have EFI*, maybe
         should have brought that up while we were in BIOS
-      - go back to BIOS and un-enable legacy mode, given that the x1 should
-        come with (U)EFI by default enabled.
       - use the following command to ensure we are in EFI mode:
         #+BEGIN_SRC sh
           ls /sys/firmware/efi/
@@ -278,7 +283,7 @@
    2. figure out where our main drive is
       1. find our drives with ~lsblk~ yet again
          - my x1 came with a PCIe ssd, yours may or may not and, more
-           importantly, this influences its name as seen with ~lsblk~
+           importantly, this influences its name as seen with ~lsblk~ (i think)
            - for the PCIe ssd, it will be called something like ~nvme0n1~, with
              each partition appending a ~p1~, ~p2~, and so forth
            - for others, it may appear as the traditional ~sda~, with a number
@@ -289,7 +294,7 @@
              - cannot have an optimally secure setup otherwise (or rather, I'm
                not going to put up with that much of a headache).
            - if you want to keep a dual boot setup, this is not the guide for you.
-           - i am sorry to fail you like this. f.
+           - i am sorry to fail you like this, my kings and queens. f.
    3. partitioning and configuring
       1. we will now format our main drive with arch
          #+BEGIN_SRC 
@@ -337,25 +342,27 @@
              - *we are going to write to disk*
            - ~y~
              - *we just wrote to disk. goodbye everything else*
-      3. encryption with ~cryptsetup~
-         - make sure to use our *second partition*
-           - *not* our EFI partition
-             #+BEGIN_SRC sh
-               # in my case, this is...
-               cryptsetup luksFormat /dev/nvme0n1p2
-             #+END_SRC
-           - you will be prompted for a password, make it a good one
-           - we do not specify the luks type, such as ~luks2~, because it is
-             incompatible with GRUB. We will not be using GRUB, but I do not
-             want to screw myself (or you) out of that option.
-             - for the love of god, do not forget this password
-             - this process could take like 2 or 3 or 4 hours depending on
-               your experience and the last thing you need to do is forget the
-               fucking luks password.
-           - what we have now is a Luks container, which we will be using to
-             put our actual OS/data in, which makes handling encryption logic
-             easier in the long run.
-   4. generation of logical volumes within our LVM
+
+** encryption and mounting                                              :TOC:
+   1. encryption with ~cryptsetup~
+      - make sure to use our *second partition*
+        - *not* our EFI partition
+          #+BEGIN_SRC sh
+            # in my case, this is...
+            cryptsetup luksFormat /dev/nvme0n1p2
+          #+END_SRC
+        - you will be prompted for a password, make it a good one
+        - we do not specify the luks type, such as ~luks2~, because it is
+          incompatible with GRUB. We will not be using GRUB, but I do not
+          want to screw myself (or you) out of that option.
+          - for the love of god, do not forget this password
+          - this process could take like 2 or 3 or 4 hours depending on
+            your experience and the last thing you need to do is forget the
+            fucking luks password.
+        - what we have now is a Luks container, which we will be using to
+          put our actual OS/data in, which makes handling encryption logic
+          easier in the long run.
+   2. generation of logical volumes within our LVM
       1. open our encrypted container:
          - we need to name the container, I am choosing ~main_part~ for main
            partition, it really doesn't matter
@@ -405,7 +412,7 @@
               ssd to home. it goes without saying that do not do this if you
               do not want to allocate all of it to home, etc.
 
-   5. format and mount our logical partitions
+   3. format and mount our logical partitions
 
       Note that our resultant logical volumes are named
       ~<VOLUME_GROUP_NAME>-<root|home|swap>~, so my home is
@@ -445,7 +452,6 @@
               mkdir /mnt/boot/
               mount /dev/nvme0n1p1 /mnt/boot
             #+END_SRC
-
 ** installing arch and setting it up to boot and run
    1. install arch onto ~/mnt~
       #+BEGIN_SRC sh
