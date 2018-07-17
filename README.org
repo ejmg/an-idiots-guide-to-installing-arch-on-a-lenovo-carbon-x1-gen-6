@@ -2,7 +2,7 @@
 
   i am so sorry for this guide.
 
-  ![the whip](https://www.github.com/ejmg/an-idiots-guide-to-installing-arch-on-a-lenovo-carbon-x1-gen-6/master/dumb-pic-2.jpeg)
+  ![the whip](https://raw.githubusercontent.com/ejmg/an-idiots-guide-to-installing-arch-on-a-lenovo-carbon-x1-gen-6/master/dumb-pic-2.jpeg)
 
   this is an attempt at a comprehensive, start to finish, install guide for
   lenovo's 6th gen carbon x1. my model is the 20KG-0022US, which I bought from
