@@ -11,6 +11,15 @@
   laptops as they appear in the guide, but i will try to make it clear when
   such a case may not hold for others with respect to 6th gen x1 versions.
 
+  my motivation for this was pretty straightforward: i am an idiot that takes
+  notes. by the time i was like... 3/4ths through the whole process, i realized
+  these notes could be of use to a lot of other idiots who make the horrible
+  choice of pushing themselves through the hellscape of boot loader
+  configurations. also, something about writing the docs you wish to see? idk,
+  sounds fake. anywho -- hope this idiot can help other idiots figure out how
+  to do something that turns out to be not so much "hard" as it is an extended
+  and complex process for those unfamiliar with the terrain. cheers. 
+
   i want to make a shoutout to specific sources for informing this guide. it's
   the result of mashing together and cross referencing the wiki with multiple
   guides where I would verify instructions and install strategies. Included in
