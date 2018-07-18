@@ -69,6 +69,9 @@
   - [[#patching-for-s3-support][patching for S3 support]]
 
 * why you should or should not install arch
+  
+  
+  
   1. Pros
      - you can learn a small bit about how linux and operating systems work
      - very up to date software
@@ -76,8 +79,9 @@
      - run a very lightweight system that, outside of even more niche and
        esoteric operating systems, avoids bloat and waste
      - want something extremely sad and nerdy to """brag about""" (don't do this)
+     - a great community that is insanely intelligent and welcoming
   2. Cons
-     - my friend Chris Allen made a [[https://github.com/ejmg/an-idiots-guide-to-installing-arch-on-a-lenovo-carbon-x1-gen-6/pull/3][PR wiping the entire fucking guide]] and
+     - my friend Chris Allen made a [[https://github.com/ejmg/an-idiots-guide-to-installing-arch-on-a-lenovo-carbon-x1-gen-6/pull/3][PR deleting the entire guide]] and
        simply suggesting you Don't Install Arch
        - the man has a /solid/ point
      - it can take a lot of time to get going
@@ -85,18 +89,13 @@
          doesn't have some proprietary code that throws you into kernel h e l l
        - you could equally do something better with your time, like sleep,
          call your mom, or, idk, hangout with friends if you have those.
-       - not proud of this, but it took me like 8 hours to get it all right
-         for the first time. i'm an idiot, though. ergo, /idiot's guide/
      - it has the most up to date packages, which translates to instability
        and things breaking more often
        - if you do software, this is actually something you often don't want
          outside of maybe what you work on the most.
-     - ricing
-       - this is just the time point again
-       - but really, what good does it serve you to be constantly tweaking your
-         configurations and init files and thus constantly having to fix them
-       - arch doesn't actually require that, but it is so tempting to do and
-         thus a danger
+     - a community with members known for [[file:user-testimonials.png][rote recitation of "just look at the
+       wiki" and who like to discourage making things easily accessible for
+       those who don't have all day to mess around on a computer]].
 
 * disclaimer (sacrifices, incantations, don't sue me, etc.)
   since we are installing arch, there a a few precautions you'll want to
