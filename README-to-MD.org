@@ -93,7 +93,7 @@
        and things breaking more often
        - if you do software, this is actually something you often don't want
          outside of maybe what you work on the most.
-     - a community with members known for [[file:user-testimonials.png][rote recitation of "just look at the
+     - a community with members known for [[https://raw.githubusercontent.com/ejmg/an-idiots-guide-to-installing-arch-on-a-lenovo-carbon-x1-gen-6/master/user-testimonials.png][rote recitation of "just look at the
        wiki" and who like to discourage making things easily accessible for
        those who don't have all day to mess around on a computer]].
 
