@@ -179,7 +179,7 @@
           #+BEGIN_SRC sh
             Server = http://mirrors.lug.mtu.edu/archlinux/$repo/os/$arch
           #+END_SRC
-      - *important* refresh our mirrorlist
+      - *important* refresh our mirrorlist and upgrade packages if needed
         #+BEGIN_SRC sh
           pacman -Syu
         #+END_SRC
@@ -448,7 +448,7 @@
             #+END_SRC
          2. create root
             #+BEGIN_SRC sh
-              # 8 gb for swap
+              # 8 gb for root
               lvcreate -L64G main_group -n root
             #+END_SRC
          3. create home
