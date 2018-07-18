@@ -179,9 +179,9 @@
           #+BEGIN_SRC sh
             Server = http://mirrors.lug.mtu.edu/archlinux/$repo/os/$arch
           #+END_SRC
-      - *important* refresh our mirrorlist
+      - *important* refresh our mirrorlist and upgrade packages if needed
         #+BEGIN_SRC sh
-          pacman -Sy
+          pacman -Syu
         #+END_SRC
         - we will now have (hopefully) fast downloads for our packages
 ** configure wifi ("optional")
@@ -550,7 +550,7 @@
         #+END_SRC
       - now install intel microcode:
         #+BEGIN_SRC 
-          pacman -Sy intel-ucode
+          pacman -S intel-ucode
         #+END_SRC
    4. other packages others recommend:
       #+BEGIN_SRC sh
