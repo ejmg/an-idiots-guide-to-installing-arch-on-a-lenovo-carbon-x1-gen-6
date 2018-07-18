@@ -181,7 +181,7 @@
           #+END_SRC
       - *important* refresh our mirrorlist
         #+BEGIN_SRC sh
-          pacman -Sy
+          pacman -Syu
         #+END_SRC
         - we will now have (hopefully) fast downloads for our packages
 ** configure wifi ("optional")
@@ -521,7 +521,7 @@
      #+END_SRC
 ** log into arch and installing stuff!
    #+BEGIN_SRC 
-     archroot /mnt
+     arch-chroot /mnt
    #+END_SRC
 
    we are now in the arch install and no longer "in" the live usb, fyi. let's
@@ -550,7 +550,7 @@
         #+END_SRC
       - now install intel microcode:
         #+BEGIN_SRC 
-          pacman -Sy intel-ucode
+          pacman -S intel-ucode
         #+END_SRC
    4. other packages others recommend:
       #+BEGIN_SRC sh
