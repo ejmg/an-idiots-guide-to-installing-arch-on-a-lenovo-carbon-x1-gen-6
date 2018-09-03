@@ -654,7 +654,7 @@
    - From here, we can *officially reboot into our install and it should work*
      - 🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉
      - 🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉
-   - execute ~shutdown now~
+   - execute ~exit~ then ~shutdown now~
      - remove the usb once the laptop turns off
      - you should eventually see the boot screen which will automatically
        boot into arch after 2 seconds or so
