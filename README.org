@@ -448,7 +448,7 @@
             #+END_SRC
          2. create root
             #+BEGIN_SRC sh
-              # 8 gb for swap
+              # 64 gb for root
               lvcreate -L64G main_group -n root
             #+END_SRC
          3. create home
