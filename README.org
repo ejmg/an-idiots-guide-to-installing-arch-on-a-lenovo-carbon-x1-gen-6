@@ -535,7 +535,7 @@
    2. for a fact will want to install all the packages in relation to wifi
       if you do not have an adapter like me.
       #+BEGIN_SRC sh
-        pacman -S wpa_supplicant networkmanager network-manager-applet dialogue 
+        pacman -S wpa_supplicant networkmanager network-manager-applet dialog 
       #+END_SRC
    3. packages for intel microcode drivers, *important*
       - microcode is key to stability and patching issues with intel
