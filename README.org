@@ -602,7 +602,7 @@
         bootctl --path=/boot/ install
       #+END_SRC
    2. create arch loader
-      - modify the file ~/boot/loader.conf~ to reflect the following:
+      - modify the file ~/boot/loader/loader.conf~ to reflect the following:
         #+BEGIN_SRC conf
           default arch
           timeout 3
