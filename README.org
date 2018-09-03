@@ -550,7 +550,7 @@
         #+END_SRC
       - now install intel microcode:
         #+BEGIN_SRC 
-          pacman -S intel-ucode
+          pacman -Sy intel-ucode
         #+END_SRC
    4. other packages others recommend:
       #+BEGIN_SRC sh
