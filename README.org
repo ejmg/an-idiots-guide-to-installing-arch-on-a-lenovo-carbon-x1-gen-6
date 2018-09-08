@@ -448,7 +448,7 @@
             #+END_SRC
          2. create root
             #+BEGIN_SRC sh
-              # 8 gb for swap
+              # 64 gb for root
               lvcreate -L64G main_group -n root
             #+END_SRC
          3. create home
@@ -535,7 +535,7 @@
    2. for a fact will want to install all the packages in relation to wifi
       if you do not have an adapter like me.
       #+BEGIN_SRC sh
-        pacman -S wpa_supplicant networkmanager network-manager-applet dialogue 
+        pacman -S wpa_supplicant networkmanager network-manager-applet dialog 
       #+END_SRC
    3. packages for intel microcode drivers, *important*
       - microcode is key to stability and patching issues with intel
@@ -550,7 +550,7 @@
         #+END_SRC
       - now install intel microcode:
         #+BEGIN_SRC 
-          pacman -S intel-ucode
+          pacman -Sy intel-ucode
         #+END_SRC
    4. other packages others recommend:
       #+BEGIN_SRC sh
@@ -602,7 +602,7 @@
         bootctl --path=/boot/ install
       #+END_SRC
    2. create arch loader
-      - modify the file ~/boot/loader.conf~ to reflect the following:
+      - modify the file ~/boot/loader/loader.conf~ to reflect the following:
         #+BEGIN_SRC conf
           default arch
           timeout 3
@@ -654,7 +654,7 @@
    - From here, we can *officially reboot into our install and it should work*
      - 🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉
      - 🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉
-   - execute ~shutdown now~
+   - execute ~exit~ then ~shutdown now~
      - remove the usb once the laptop turns off
      - you should eventually see the boot screen which will automatically
        boot into arch after 2 seconds or so
