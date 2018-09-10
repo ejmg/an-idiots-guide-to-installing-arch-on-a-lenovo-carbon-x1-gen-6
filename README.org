@@ -66,7 +66,7 @@
   - [[#bios-update][bios update]]
   - [[#trimming-ssd][trimming SSD]]
   - [[#hibernate-support][hibernate support]]
-  - [[#patching-for-s3-support][patching for S3 support]]
+  - [[#suspend-support][suspend support]]
 
 * why you should or should not install arch
   
@@ -959,47 +959,26 @@
        - lenovo i love you, please stop hurting us like this
        - please look at the script yourself, see the options you have: https://github.com/erpalma/lenovo-throttling-fix
 ** bios update
-   Lenovo has released an updated bio since (i'm guessing) most x1c6 units
-   shipped, at least my model for sure.
-     - has several improvements that are honestly worth risking a manual bios
-       update
+   Lenovo has released several bios updates since many x1c6 units shipped (at least my model for sure).
+     - these updates have had several improvements that are honestly worth risking a manual bios
+       update (including explicit s3 suspend support for linux).
      - recall that disclaimer I had at the beginning? this action, more than
-       anything, requires it
-       - *you are responsible* for the result of updating your bios. *i am not*.
+       anything, requires it *you are responsible* for the result of updating your bios. *i am not*.
      - to update your bios:
-       1. first go get the update, [[https://download.lenovo.com/pccbbs/mobiles/n23ur08w.iso][here]].
-       2. install the following utility made just for this:
-         #+BEGIN_SRC sh
-           aurman -S geteltorito
-         #+END_SRC
-       3. we now will extract the .img from the .iso that Lenovo provided us:
-          #+BEGIN_SRC sh
-            geteltorito.pl -o <image>.img <image>.iso
-          #+END_SRC
-          - where the ~.img~ is our *output* from extracting. Do not mix this up later.
-            - i say this because when i was doing this myself at like 1am, i sure
-              as hell did for a while and wasted 30 mins trying to figure out why
-              my stupid update wouldn't initiate upon boot
-       4. now we will make a live usb with the ~.img~
-          - this is just like what we did when we made the arch live usb
-            - same disclaimers apply: do not mix up your source with your
-              destination, and double check the name of your drive with ~lsblk~
-            - i will assume the device is named ~sdb~ for the purpose of this
-              tutorial
-            - make sure the drive is not mounted as well
-          - with a spare usb you are okay with completely wiping clean, do the
-            following:
-            #+BEGIN_SRC sh
-              dd if=/path/to/bios.img of=/dev/sdb bs=512K status=progress
-            #+END_SRC
-       5. now, with our new live-usb in hand, reboot the laptop and boot into the
-          usb
-          - you may first need to go back into bios and move the usb to the top
-            of the boot order config like we needed to when installing arch
-       6. once booted into the usb, *choose option #2*.
-          - agree to all the disclaimers, make sure your *laptop is plugged
-            in*, and wait for the update to work itself out.
-          - if you would like a video of what this process visually looks like, [[https://www.youtube.com/watch?v=mEcASjftccE][here ya go]]
+       - first install the ~fwupd~ package which is a cross-vendor daemon that allows you to install firmware updates provided from your manufacturer directly from linux.
+       #+BEGIN_SRC sh
+         sudo pacman -S fwupd
+       #+END_SRC
+       - next we will refresh the update metadata and check for updates:
+       #+BEGIN_SRC sh
+         fwpudmgr refresh 
+         fwpudmgr get-updates
+       #+END_SRC
+       - lastly, lets do the update! verify from the above commands the you have updates that need to be applied. *make sure your laptop is hooked up to power*.
+       #+BEGIN_SRC sh
+         fwupdmgr update
+       #+END_SRC
+
 ** trimming SSD
    - not lenovo exclusive but /shrug/
      - "trimming" your ssd regularly improves its performance by allowing it
@@ -1042,66 +1021,18 @@
           initrd /initramfs-linux.img
           options cryptdevice=UUID=<LONG-ALPHANUM-STRING>:cryptlvm root=/dev/mapper/main_group-root resume=/dev/mapper/main_group-swap quiet rw
         #+END_SRC
-** patching for S3 support
-   1. s3 vs s0i3 sleep state
-      - this is a lot trickier and i won't be walking you through this
-      - tl;dr, MCSFT is pushing a new sleep state standard, s0i3, that makes laptop behave more
-        akin to phones
-        - pros: they can do stuff like connect to wifi, update, and refresh
-          user data while asleep
-        - cons: massively more energy use
-      - lenovo decided to support this: okay, fine
-        - ... but also decided to completely remove support for previous
-          format, S3
-          - wait, *why, lenovo, why??????*
-      - Making matters worse: neither are now properly supported by linux
-        because of lenovo's implementation, you need to apply a patch fix
-        either way
-        - it involves patching the kernal or editing boot configs
-        - didn't mention them earlier because this is an idiot's guide and i
-          didn't want to overwhelm you
-          - i was also overwhelmed, i was the idiot
-      - reference the wiki, make your decision:
-        - if you want to return to S3, follow this guide: https://delta-xi.net/#056
-        - it is very good and really does guide you through all the steps, do
-          not be intimidated
-   2. if you follow the s3 guide (as I did), some advice:
-      1. *first and foremost, update your bios as described above*
-         1. good chance your s3 won't work nearly as good without it (if at
-            all, going by forum discussions)
-      2. when running the patch, Hunk 7 failed for me.
-         1. solution: there is a function call that will look like this in
-            your .dsl:
-            #+BEGIN_SRC asm
-              OperationRegion (GNVS, SystemMemory, 0x4FF4E000,0x0771)
-            #+END_SRC
-            - the last two values are different from the ~.patch~ the author
-              provides. Edit the values *in the patch* to be the *same* as
-              those in your *.dsl*
-            - after this, *regenerate* the .dsl as the author guides you and
-              reapply the patch as instructed, hunk 7 should now pass.
-         2. the author uses ~GRUB~, if you followed my guide, you don't use
-            ~GRUB~ like me.
-            1. Follow the guide as instructed up to, and including, to where
-               we ~cp~ the ~acpi_override~ to ~/boot/~
-            2. Now we need to edit our ~arch.conf~ entry that we made earlier
-               in ~/boot/loader/entries/~
-               - we are making two additions, adding a ~initrd /acpi_override~
-                 entry and then adding another kernal param argument to
-                 options, ~mem_sleep_default=deep~
-               - this is what my ~arch.conf~ looks like:
-                 #+BEGIN_SRC conf
-                   title Arch Linux
-                   linux /vmlinuz-linux
-                   initrd /intel-ucode.img
-                   initrd /acpi_override
-                   initrd /initramfs-linux.img
-                   options cryptdevice=UUID=<LONG-ALPHANUM-STRING>:cryptlvm root=/dev/mapper/main_group-root mem_sleep_default=deep quiet rw
-                 #+END_SRC
-                 - notice the fourth line and the end of the last line, you'll
-                   see my edits as compared to when we first made this file
-                 - I've excluded the edit for enabling hibernation from this
-                   example, fyi
-   3. update: there is a script to do this if you feel comfortable using it!
-      - look [[https://github.com/fiji-flo/x1carbon2018s3][here]]
+** suspend support
+The X1C6 is capable of supporting both s3 vs s0i3 sleep states.  
+   - *s3* - The s3 sleep state is where the CPU has no power. RAM maintains power, refreshes slowly. This is the traditional "suspend" state most people are familiar with.
+   - *s0i3* - The s0i3 sleep state is a new standard being pushed by MCSFT that makes laptops behave more akin to phones.  It allows devices to connect to wifi, update, refresh user data, etc.
+
+This guide suggests *enabling the S3 sleep state* because the S0i3 sleep state is not well supported in Linux yet and it comes with higher power usage. 
+
+   1. confirm that you don't have s3 currently enabled by executing:
+       #+BEGIN_SRC sh
+           dmesg | grep -i "acpi: (supports"
+       #+END_SRC
+   2. *update your bios as described above*.  You *must* be running bios >= v1.30 because the bios option is new.  
+   3. reboot your machine and change ~Config -> Power -> Sleep State - Set to "Linux"~
+   4.  book back into linux and re-run the ~dmesg~ command again to ensure that S3 is now available.
 
