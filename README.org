@@ -971,8 +971,8 @@
        #+END_SRC
        - next we will refresh the update metadata and check for updates:
        #+BEGIN_SRC sh
-         fwpudmgr refresh 
-         fwpudmgr get-updates
+         fwupdmgr refresh 
+         fwupdmgr get-updates
        #+END_SRC
        - lastly, lets do the update! verify from the above commands the you have updates that need to be applied. *make sure your laptop is hooked up to power*.
        #+BEGIN_SRC sh
