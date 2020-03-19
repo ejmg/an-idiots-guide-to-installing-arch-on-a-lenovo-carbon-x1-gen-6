@@ -414,7 +414,7 @@
          - we need to name the container, I am choosing ~main_part~ for main
            partition, it really doesn't matter
            #+BEGIN_SRC sh
-             cryptsetup open --type luks /dev/nmve0n1p2 main_part
+             cryptsetup open --type luks /dev/nvme0n1p2 main_part
            #+END_SRC
          - this should now be available at ~/dev/mapper/main_part~
       2. create a physical volume within our LVM partition:
